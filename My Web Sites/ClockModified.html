@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>//This is the start of the HTML document. All the content of the document is enclosed within these opening and closing HTML tags.
+	<body>//This is the start of the body of the HTML document. This is where the visible content of the web page goes.
+
+		<canvas id="canvas" width="400" height="400"
+			style="background-color:#333">
+		</canvas>//This creates a canvas element with an ID of "canvas" and sets its width and height to 400 pixels. 
+		//The style attribute sets the background color of the canvas to dark gray (#333).
+
+		<script>//This is the start of a JavaScript script.
+			var canvas = document.getElementById("canvas");//This assigns the canvas element with the ID "canvas" to a variable called "canvas".
+			var ctx = canvas.getContext("2d");//This assigns the 2D rendering context of the canvas to a variable called "ctx". 
+			//This context is used to draw shapes and text onto the canvas.
+			var radius = canvas.height / 2;//This calculates the radius of the clock face by dividing the height of the canvas by 2
+			ctx.translate(radius, radius);//This moves the origin of the canvas context to the center of the clock face.
+			radius = radius * 0.90//This reduces the radius of the clock face to make room for the clock hands.
+			setInterval(drawClock, 1000);//This sets up an interval timer that calls the "drawClock" function every second (1000 milliseconds).
+
+			function drawClock() {
+  				drawFace(ctx, radius);
+  				drawNumbers(ctx, radius);
+  				drawTime(ctx, radius);
+			}//This calls three other functions that draw the clock face, numbers, and hands.
+
+			function drawFace(ctx, radius) {//This defines the "drawFace" function, which draws the clock face.
+  				var grad;//This declares a variable called "grad" that will be used to create a radial gradient.
+  				ctx.beginPath();//This starts a new path on the canvas.
+  				ctx.arc(0, 0, radius, 0, 2*Math.PI);//This draws a circle centered at (0, 0) with a radius of "radius".
+  				ctx.fillStyle = 'white';
+  				ctx.fill();//This fills the circle with white.
+  				grad = ctx.createRadialGradient(0,0,radius*0.95, 0,0,radius*1.05);
+				//This creates a radial gradient centered at (0, 0) with an inner radius of 0.95 times the clock face radius and an outer radius of 1.05 times the clock face radius.
+			
+  				grad.addColorStop(0, '#333');
+  				grad.addColorStop(0.5, 'white');
+  				grad.addColorStop(1, '#333');//This sets the color stops for the gradient, 
+				//with the outer part of the gradient being dark gray (#333), the middle being white, and the inner part being
+  				ctx.strokeStyle = grad;//Set the color and gradient style for the stroke of the clock face's border to the grad variable that was defined earlier.
+  				ctx.lineWidth = radius*0.1;//Set the line width for the stroke of the clock face's border to 10% of the radius.
+  				ctx.stroke();//Draw the stroke around the clock face.
+  				ctx.beginPath();
+  				ctx.arc(0, 0, radius*0.1, 0, 2*Math.PI);//Create a new path and draw a small circle at the center of the clock face.
+  				ctx.fillStyle = '#333';//Set the fill color for the small circle to dark gray.
+  				ctx.fill();//Fill the small circle with the specified color.
+			}
+
+			function drawNumbers(ctx, radius) {//Define a function called drawNumbers that takes in the ctx and radius parameters.
+  				var ang;//Declare the ang and num variables.
+  				var num;//Set the font style for the numbers to be drawn on the clock face. The font size is set to 15% of the radius and the font family is "arial".
+  				ctx.font = radius*0.15 + "px arial";//Set the text baseline and alignment for the numbers to be drawn on the clock face. 
+				//The baseline is set to "middle" and the alignment is set to "center".
+  				ctx.textBaseline="middle";
+  				ctx.textAlign="center";
+  				for(num = 1; num < 13; num++){//Loop through the numbers 1 to 12 to draw on the clock face.
+    					ang = num * Math.PI / 6;
+    					ctx.rotate(ang);
+    					ctx.translate(0, -radius*0.85);
+    					ctx.rotate(-ang);//Calculate the angle for the current number, rotate the canvas context by that angle, translate to the appropriate position to draw the number, and then rotate the canvas context back to the original orientation.
+
+    					ctx.fillText(num.toString(), 0, 0);//Draw the current number at the current position.
+    					ctx.rotate(ang);
+    					ctx.translate(0, radius*0.85);
+    					ctx.rotate(-ang);
+						//Rotate the canvas context by the current angle, translate back to the center of the clock face, and rotate the canvas context back to the original orientation to prepare for the next number to be drawn.
+
+
+
+  				}
+			}
+
+			function drawTime(ctx, radius){
+				// Get the current time
+				var now = new Date();
+			
+				// Get the hours, minutes, and seconds from the current time
+				var hour = now.getHours();
+				var minute = now.getMinutes();
+				var second = now.getSeconds();
+			
+				// Calculate the angle for the hour hand
+				hour=hour%12;
+				hour=(hour*Math.PI/6)+(minute*Math.PI/(6*60))+(second*Math.PI/(360*60));
+			
+				// Draw the hour hand
+				drawHand(ctx, hour, radius*0.5, radius*0.07);
+			
+				// Calculate the angle for the minute hand
+				minute=(minute*Math.PI/30)+(second*Math.PI/(30*60));
+			
+				// Draw the minute hand
+				drawHand(ctx, minute, radius*0.8, radius*0.07);
+			
+				// Calculate the angle for the second hand
+				second=(second*Math.PI/30);
+			
+				// Draw the second hand
+				drawHand(ctx, second, radius*0.9, radius*0.02);
+			}
+			
+
+			function drawHand(ctx, pos, length, width) {
+				// Begin a new path
+				ctx.beginPath();
+			
+				// Set the width of the line
+				ctx.lineWidth = width;
+			
+				// Set the line cap style
+				ctx.lineCap = "round";
+			
+				// Move to the starting point of the line
+				ctx.moveTo(0,0);
+			
+				// Rotate the canvas to the correct angle
+				ctx.rotate(pos);
+			
+				// Draw the line
+				ctx.lineTo(0, -length);
+			
+				// Stroke the line (draw it)
+				ctx.stroke();
+			
+				// Rotate the canvas back to its original position
+				ctx.rotate(-pos);
+			}
+			
+		</script>
+
+	</body>
+</html>
